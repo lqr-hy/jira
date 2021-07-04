@@ -29,7 +29,7 @@ export const useMount = (callback: () => void) => {
 };
 
 // userDebounce 防抖
-export const useDebounce = (value: unknown, delay?: number): any => {
+export const useDebounce = <V>(value: V, delay?: number) => {
   // 设置一个值控制value
   const [debounceValue, setDebounceValue] = useState(value);
   useEffect(() => {
