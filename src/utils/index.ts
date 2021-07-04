@@ -1,7 +1,7 @@
 // 判断零的情况
 import { useEffect, useState } from "react";
 
-export const isFalsy = (value: any) => (value === "0" ? false : !value);
+export const isFalsy = (value: unknown) => (value === "0" ? false : !value);
 
 // 在函数里面别污染传入的变量
 export const clearObject = (object: object) => {
@@ -29,7 +29,7 @@ export const useMount = (callback: () => void) => {
 };
 
 // userDebounce 防抖
-export const useDebounce = (value: any, delay?: number) => {
+export const useDebounce = (value: unknown, delay?: number): any => {
   // 设置一个值控制value
   const [debounceValue, setDebounceValue] = useState(value);
   useEffect(() => {
