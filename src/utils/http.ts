@@ -1,7 +1,7 @@
 import * as auth from "auth-provider";
 import { useAuth } from "../context/auth-context";
 
-const apiUrl = process.env["REACT_APP_API_URL"];
+const apiUrl = process.env.REACT_APP_API_URL;
 
 interface Config extends RequestInit {
   data?: object;
@@ -15,8 +15,8 @@ export const http = async (
   const config = {
     method: "GET",
     headers: {
-      authorization: token ? `Bearer ${token}` : "",
-      "content-type": data ? "application/json" : "",
+      Authorization: token ? `Bearer ${token}` : "",
+      "Content-type": data ? "application/json" : "",
     },
     ...customConfig,
   };
