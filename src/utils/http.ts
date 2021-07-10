@@ -1,4 +1,5 @@
 import * as auth from "auth-provider";
+import qs from "qs";
 import { useAuth } from "../context/auth-context";
 
 const apiUrl = process.env.REACT_APP_API_URL;
@@ -20,6 +21,11 @@ export const http = async (
     },
     ...customConfig,
   };
+  if (config.method.toUpperCase() === "GET") {
+    endPoint += `?${qs.stringify(data)}`;
+  } else {
+    config.body = JSON.stringify(data || {});
+  }
   // fetch 不会对 400 | 500 抛出异常
   return window
     .fetch(`${apiUrl}/${endPoint}`, config)
