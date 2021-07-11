@@ -25,7 +25,9 @@ export const clearObject = (object: object) => {
 export const useMount = (callback: () => void) => {
   useEffect(() => {
     callback();
-  }, [callback]);
+    // }, [callback]);
+    // eslint-disable-next-line
+  }, []);
 };
 
 // userDebounce 防抖

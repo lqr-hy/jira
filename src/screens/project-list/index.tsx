@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { clearObject } from "utils/index";
 import { useDebounce, useMount } from "../../utils";
 import { useHttp } from "../../utils/http";
+import styled from "@emotion/styled";
 
 // const apiUrl = process.env["REACT_APP_API_URL"];
 export const ProjectListScreen = () => {
@@ -24,27 +25,20 @@ export const ProjectListScreen = () => {
   // 当params 改变的时候获取数据
   useEffect(() => {
     client("projects", { data: clearObject(debounceValue) }).then(setList);
-    // fetch(
-    //   `${apiUrl}/projects?${qs.stringify(clearObject(debounceValue))}`
-    // ).then(async (response) => {
-    //   if (response.ok) {
-    //     setList(await response.json());
-    //   }
-    // });
   }, [debounceValue, client]);
 
   useMount(() => {
-    client("users").then(setUsers);
-    // fetch(`${apiUrl}/users`).then(async (response) => {
-    //   if (response.ok) {
-    //     setUsers(await response.json());
-    //   }
-    // });
+    client("users").then((res) => setUsers(res));
   });
   return (
-    <>
+    <Container>
+      <h1>项目列表</h1>
       <SearchPanel params={params} setParams={setParams} users={users} />
       <List users={users} list={list} />
-    </>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  padding: 3.2rem;
+`;
