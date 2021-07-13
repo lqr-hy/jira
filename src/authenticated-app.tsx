@@ -3,7 +3,7 @@ import { useAuth } from "./context/auth-context";
 import styled from "@emotion/styled";
 import { Row } from "./components/lib";
 import { ReactComponent as SoftwareLogo } from "assets/software-logo.svg";
-import { Dropdown, Menu } from "antd";
+import { Button, Dropdown, Menu } from "antd";
 import MenuItem from "antd/es/menu/MenuItem";
 
 export const AuthenticatedApp = () => {
@@ -28,9 +28,9 @@ export const AuthenticatedApp = () => {
               </Menu>
             }
           >
-            <a href={"/#"} onClick={(e) => e.preventDefault()}>
+            <Button type={"link"} onClick={(e) => e.preventDefault()}>
               {user?.name}
-            </a>
+            </Button>
           </Dropdown>
         </HeaderRight>
       </Header>

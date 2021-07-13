@@ -3,8 +3,11 @@ import { useEffect, useState } from "react";
 
 export const isFalsy = (value: unknown) => (value === "0" ? false : !value);
 
+// 没有意义
+export const isVoid = (value: unknown) =>
+  value === undefined || value === null || value === "";
 // 在函数里面别污染传入的变量
-export const clearObject = (object: object) => {
+export const clearObject = (object: { [key: string]: unknown }) => {
   const result = { ...object };
   //找到对象的key
   Object.keys(result).forEach((key) => {
@@ -12,7 +15,7 @@ export const clearObject = (object: object) => {
     // @ts-ignore
     const value = result[key];
     // 判断值是否存在
-    if (isFalsy(value)) {
+    if (isVoid(value)) {
       // 如果值为空
       // @ts-ignore
       delete result[key];
@@ -26,7 +29,8 @@ export const useMount = (callback: () => void) => {
   useEffect(() => {
     callback();
     // }, [callback]);
-    // eslint-disable-next-line
+    // TODO 依赖项里面加上CallBack会造成无限循环 useCallback 和 useMemo有关系
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 };
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { RegisterScreens } from "./register";
 import { LoginScreens } from "./login";
-import { Button, Card, Divider } from "antd";
+import { Button, Card, Divider, Typography } from "antd";
 import styled from "@emotion/styled";
 import logo from "assets/logo.svg";
 import left from "assets/left.svg";
@@ -9,16 +9,25 @@ import right from "assets/right.svg";
 
 export const UnauthenticatedApp = () => {
   const [isRegister, setIsRegister] = useState(false);
+  const [error, setError] = useState(Error || null);
   return (
     <Container>
       <Header />
       <Background />
       <ShowCard>
-        {isRegister ? <RegisterScreens /> : <LoginScreens />}
+        <TitleH3>{isRegister ? "请注册" : "请登录"}</TitleH3>
+        {error ? (
+          <Typography.Text type={"danger"}>{error.message}</Typography.Text>
+        ) : null}
+        {isRegister ? (
+          <RegisterScreens onError={setError} />
+        ) : (
+          <LoginScreens onError={setError} />
+        )}
         <Divider />
-        <a href="/#" onClick={() => setIsRegister(!isRegister)}>
+        <Button type={"link"} onClick={() => setIsRegister(!isRegister)}>
           {isRegister ? "没有账号？请注册新账号" : "已有账号？请去登录"}
-        </a>
+        </Button>
       </ShowCard>
     </Container>
   );
@@ -45,6 +54,13 @@ export const Header = styled.header`
 
 export const LongButton = styled(Button)`
   width: 100%;
+`;
+
+export const TitleH3 = styled.h3`
+  width: 100%;
+  text-align: center;
+  color: #d8d8d8;
+  font-size: 28px;
 `;
 
 const ShowCard = styled(Card)`
