@@ -47,3 +47,22 @@ export const useDebounce = <V>(value: V, delay?: number) => {
   }, [value, delay]);
   return debounceValue;
 };
+
+//  设置标题的hooks
+export const useDocumentTitle = (
+  title: string,
+  keepOnUnmount: boolean = true
+) => {
+  let oldTitle = document.title;
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+
+  useEffect(() => {
+    return () => {
+      if (!keepOnUnmount) {
+        document.title = oldTitle;
+      }
+    };
+  }, []);
+};
