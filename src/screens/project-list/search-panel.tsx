@@ -1,7 +1,9 @@
-import { Form, Input, Select } from "antd";
+import { Form, Input } from "antd";
+import { Project } from "./list";
+import { UseSelect } from "../../components/use-select";
 
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
   title: string;
@@ -10,15 +12,12 @@ export interface User {
 }
 
 interface SearchPanelProps {
-  params: {
-    name: string;
-    personId: string;
-  };
+  params: Partial<Pick<Project, "name" | "personId">>;
   setParams: (params: SearchPanelProps["params"]) => void;
   users: User[];
 }
 
-export const SearchPanel = ({ params, setParams, users }: SearchPanelProps) => {
+export const SearchPanel = ({ params, setParams }: SearchPanelProps) => {
   return (
     <Form style={{ marginBottom: "2rem" }} layout={"inline"}>
       <Form.Item>
@@ -34,7 +33,8 @@ export const SearchPanel = ({ params, setParams, users }: SearchPanelProps) => {
         />
       </Form.Item>
       <Form.Item>
-        <Select
+        <UseSelect
+          defaultOptionName={"负责人"}
           value={params.personId}
           onChange={(value) =>
             setParams({
@@ -42,14 +42,7 @@ export const SearchPanel = ({ params, setParams, users }: SearchPanelProps) => {
               personId: value,
             })
           }
-        >
-          <Select.Option value={""}>负责人</Select.Option>
-          {users.map((user) => (
-            <Select.Option key={user.id} value={String(user.id)}>
-              {user.name}
-            </Select.Option>
-          ))}
-        </Select>
+        />
       </Form.Item>
     </Form>
   );

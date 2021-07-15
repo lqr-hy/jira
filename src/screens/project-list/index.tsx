@@ -7,15 +7,15 @@ import styled from "@emotion/styled";
 import { Typography } from "antd";
 import { useProject } from "../../utils/useProject";
 import { useUsers } from "../../utils/use-users";
-import { useUrlQueryParams } from "../../utils/url";
+// import { useUrlQueryParams } from "../../utils/url";
+import { useProjectParams } from "./utils";
 // import { Helmet } from "react-helmet";
 // const apiUrl = process.env["REACT_APP_API_URL"];
 export const ProjectListScreen = () => {
   // input 输入的数据
 
-  const [params, setParams] = useUrlQueryParams(["name", "personId"]);
-  const debounceValue = useDebounce(params, 12000);
-  const { isLoading, error, data: list } = useProject(debounceValue);
+  const [param, setParams] = useProjectParams();
+  const { isLoading, error, data: list } = useProject(useDebounce(param, 200));
   const { data: users } = useUsers();
 
   useDocumentTitle("项目列表", false);
@@ -26,7 +26,7 @@ export const ProjectListScreen = () => {
       {/*  <title>项目列表</title>*/}
       {/*</Helmet>*/}
       <h1>项目列表</h1>
-      <SearchPanel params={params} setParams={setParams} users={users || []} />
+      <SearchPanel params={param} setParams={setParams} users={users || []} />
       {error ? (
         <Typography.Text type={"danger"}>{error.message}</Typography.Text>
       ) : null}
