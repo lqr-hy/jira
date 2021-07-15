@@ -12,11 +12,12 @@ interface SelectProps
 }
 
 export const IdSelect = (props: SelectProps) => {
-  const { value, defaultOptionName, options, onChange } = props;
+  const { value, defaultOptionName, options, onChange, ...restProps } = props;
   return (
     <Select
       value={toNumber(value)}
       onChange={(value) => onChange(toNumber(value) || undefined)}
+      {...restProps}
     >
       {defaultOptionName ? (
         <Select.Option value={0}>{defaultOptionName}</Select.Option>
