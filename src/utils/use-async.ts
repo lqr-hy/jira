@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useMountRef } from "./index";
 
 interface State<D> {
   data: D | null;
@@ -25,6 +26,8 @@ export const useAsync = <D>(
     ...defaultState,
     ...initialState,
   });
+  // 解决异步数据还没回来的时候就退出了 或者异步数据回来慢的问题
+  const mountRef = useMountRef();
   // 使用useState的惰性
   const [retry, setRetry] = useState(() => () => {});
   // 数据获取成功
@@ -52,7 +55,7 @@ export const useAsync = <D>(
     return (
       promise
         .then((data) => {
-          setData(data);
+          if (mountRef.current) setData(data);
           return data;
         })
         //  catch 会消化错误，所以不会抛出错误，
