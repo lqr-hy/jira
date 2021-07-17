@@ -25,16 +25,28 @@ export const useAsync = <D>(
     ...defaultState,
     ...initialState,
   });
+  // 使用useState的惰性
+  const [retry, setRetry] = useState(() => () => {});
   // 数据获取成功
   const setData = (data: D) => setState({ data, stat: "success", error: null });
   // 数据获取失败
   const setError = (error: Error) =>
     setState({ data: null, error: error, stat: "error" });
   // 处理异步请求
-  const run = (promise: Promise<D>) => {
+  const run = (
+    promise: Promise<D>,
+    retryConfig?: { retry: () => Promise<D> }
+  ) => {
     if (!promise || !promise.then) {
       throw new Error("请传入promise数据");
     }
+    //保存 promise
+    setRetry(() => () => {
+      if (retryConfig?.retry) {
+        return run(retryConfig?.retry(), retryConfig);
+      }
+    });
+
     // 发送请求设置状态为loading
     setState({ ...state, stat: "loading" });
     return (
@@ -60,6 +72,7 @@ export const useAsync = <D>(
     run,
     setData,
     setError,
+    retry,
     ...state,
   };
 };
