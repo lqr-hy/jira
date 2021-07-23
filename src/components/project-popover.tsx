@@ -1,8 +1,8 @@
-import { Button, Divider, List, Popover, Typography } from "antd";
+import { Divider, List, Popover, Typography } from "antd";
 import { useProject } from "../utils/useProject";
 import styled from "@emotion/styled";
 
-export const ProjectPopover = () => {
+export const ProjectPopover = (props: { projectButton: JSX.Element }) => {
   const { data: list, isLoading } = useProject();
 
   const popoverListData = list?.filter((list) => list.pin);
@@ -18,9 +18,7 @@ export const ProjectPopover = () => {
         ))}
       </List>
       <Divider />
-      <Button style={{ padding: 0 }} type={"link"}>
-        创建项目
-      </Button>
+      {props.projectButton}
     </Container>
   );
 

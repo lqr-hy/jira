@@ -1,5 +1,5 @@
 import { User } from "./search-panel";
-import { Table, TableProps } from "antd";
+import { Button, Dropdown, Menu, Table, TableProps } from "antd";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import { Pin } from "../../components/pin";
@@ -17,6 +17,7 @@ export interface Project {
 interface ListProps extends TableProps<any> {
   users: User[];
   refresh?: () => void;
+  projectButton?: JSX.Element;
 }
 
 export const List = ({ users, ...props }: ListProps) => {
@@ -70,6 +71,22 @@ export const List = ({ users, ...props }: ListProps) => {
                   ? dayjs(project.created).format("YYYY-MM--DD")
                   : "无"}
               </span>
+            );
+          },
+        },
+        {
+          title: "编辑",
+          render(value, project) {
+            return (
+              <Dropdown
+                overlay={
+                  <Menu>
+                    <Menu.Item key={"edit"}>{props.projectButton}</Menu.Item>
+                  </Menu>
+                }
+              >
+                <Button type={"link"}>...</Button>
+              </Dropdown>
             );
           },
         },
