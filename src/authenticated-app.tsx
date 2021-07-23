@@ -9,8 +9,12 @@ import { Navigate, Route, Routes } from "react-router";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ProjectScreen } from "./screens/project";
 import { resetRoute } from "./utils";
+import { ProjectModal } from "./screens/project-list/project-modal";
+import { useState } from "react";
+import { ProjectPopover } from "./components/project-popover";
 
 export const AuthenticatedApp = () => {
+  const [isOpenModal, setIsOpenModal] = useState(false);
   return (
     <Container>
       <PageHeader />
@@ -26,6 +30,10 @@ export const AuthenticatedApp = () => {
           </Routes>
         </Router>
       </Main>
+      <ProjectModal
+        openModal={isOpenModal}
+        onClose={() => setIsOpenModal(false)}
+      />
     </Container>
   );
 };
@@ -38,8 +46,8 @@ const PageHeader = () => {
         <Button type={"link"} onClick={resetRoute}>
           <SoftwareLogo width={"18rem"} color={"rgba(38,132,255)"} />
         </Button>
-        <h3>项目2</h3>
-        <h3>项目3</h3>
+        <ProjectPopover />
+        <span>项目3</span>
       </HeaderLeft>
       <HeaderRight>
         <Dropdown

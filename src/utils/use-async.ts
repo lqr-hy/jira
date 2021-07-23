@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useMountRef } from "./index";
 
 interface State<D> {
@@ -31,41 +31,46 @@ export const useAsync = <D>(
   // 使用useState的惰性
   const [retry, setRetry] = useState(() => () => {});
   // 数据获取成功
-  const setData = (data: D) => setState({ data, stat: "success", error: null });
+  const setData = useCallback(
+    (data: D) => setState({ data, stat: "success", error: null }),
+    []
+  );
   // 数据获取失败
-  const setError = (error: Error) =>
-    setState({ data: null, error: error, stat: "error" });
+  const setError = useCallback(
+    (error: Error) => setState({ data: null, error: error, stat: "error" }),
+    []
+  );
   // 处理异步请求
-  const run = (
-    promise: Promise<D>,
-    retryConfig?: { retry: () => Promise<D> }
-  ) => {
-    if (!promise || !promise.then) {
-      throw new Error("请传入promise数据");
-    }
-    //保存 promise
-    setRetry(() => () => {
-      if (retryConfig?.retry) {
-        return run(retryConfig?.retry(), retryConfig);
+  const run = useCallback(
+    (promise: Promise<D>, retryConfig?: { retry: () => Promise<D> }) => {
+      if (!promise || !promise.then) {
+        throw new Error("请传入promise数据");
       }
-    });
-
-    // 发送请求设置状态为loading
-    setState({ ...state, stat: "loading" });
-    return (
-      promise
-        .then((data) => {
-          if (mountRef.current) setData(data);
-          return data;
-        })
-        //  catch 会消化错误，所以不会抛出错误，
-        .catch((error) => {
-          setError(error);
-          if (config.throwOnError) return Promise.reject(error);
-          return error;
-        })
-    );
-  };
+      //保存 promise
+      setRetry(() => () => {
+        if (retryConfig?.retry) {
+          return run(retryConfig?.retry(), retryConfig);
+        }
+      });
+      // 发送请求设置状态为loading
+      setState((prevState) => ({ ...prevState, stat: "loading" }));
+      return (
+        promise
+          .then((data) => {
+            console.log(data);
+            if (mountRef.current) setData(data);
+            return data;
+          })
+          //  catch 会消化错误，所以不会抛出错误，
+          .catch((error) => {
+            setError(error);
+            if (config.throwOnError) return Promise.reject(error);
+            return error;
+          })
+      );
+    },
+    [config.throwOnError, mountRef, setData, setError]
+  );
 
   return {
     isIdle: state.stat === "idle",

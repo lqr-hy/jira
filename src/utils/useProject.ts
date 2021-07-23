@@ -1,6 +1,6 @@
 import { useAsync } from "./use-async";
 import { Project } from "../screens/project-list/list";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { clearObject } from "./index";
 import { useHttp } from "./http";
 
@@ -8,13 +8,14 @@ export const useProject = (params?: Partial<Project>) => {
   const client = useHttp();
   const { run, ...result } = useAsync<Project[]>();
 
-  const fetchProject = () =>
-    client("projects", { data: clearObject(params || {}) });
+  const fetchProject = useCallback(
+    () => client("projects", { data: clearObject(params || {}) }),
+    [params, client]
+  );
   // 当params 改变的时候获取数据
   useEffect(() => {
     run(fetchProject(), { retry: fetchProject });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params]);
+  }, [params, fetchProject, run]);
 
   return result;
 };

@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useCallback } from "react";
 
 import * as auth from "auth-provider";
 import { User } from "../screens/project-list/search-panel";
@@ -48,9 +48,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = (form: AuthForm) => auth.register(form).then(setUser);
   const logout = () => auth.logout().then(() => setUser(null));
 
-  useMount(async () => {
-    await run(bootstrapUser());
-  });
+  useMount(
+    useCallback(async () => {
+      await run(bootstrapUser());
+    }, [run])
+  );
 
   if (isLoading || isIdle) {
     return <FullPageLoading />;
