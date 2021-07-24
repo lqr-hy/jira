@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useReducer, useState } from "react";
 import { useMountRef } from "./index";
 
 interface State<D> {
@@ -17,28 +17,40 @@ const defaultConfig = {
   throwOnError: false,
 };
 
+const useSafeDispatch = <T>(dispatch: (...args: T[]) => void) => {
+  const mountRef = useMountRef();
+
+  return useCallback(
+    (...args: T[]) => (mountRef.current ? dispatch(...args) : void 0),
+    [dispatch, mountRef]
+  );
+};
+
 export const useAsync = <D>(
   initialState?: State<D>,
   initialConfig?: typeof defaultConfig
 ) => {
   const config = { ...defaultConfig, ...initialConfig };
-  const [state, setState] = useState<State<D>>({
-    ...defaultState,
-    ...initialState,
-  });
+  const [state, dispatch] = useReducer(
+    (state: State<D>, action: Partial<State<D>>) => ({ ...state, ...action }),
+    {
+      ...defaultState,
+      ...initialState,
+    }
+  );
   // 解决异步数据还没回来的时候就退出了 或者异步数据回来慢的问题
-  const mountRef = useMountRef();
+  const safeDispatch = useSafeDispatch(dispatch);
   // 使用useState的惰性
   const [retry, setRetry] = useState(() => () => {});
   // 数据获取成功
   const setData = useCallback(
-    (data: D) => setState({ data, stat: "success", error: null }),
-    []
+    (data: D) => safeDispatch({ data, stat: "success", error: null }),
+    [safeDispatch]
   );
   // 数据获取失败
   const setError = useCallback(
-    (error: Error) => setState({ data: null, error: error, stat: "error" }),
-    []
+    (error: Error) => safeDispatch({ data: null, error: error, stat: "error" }),
+    [safeDispatch]
   );
   // 处理异步请求
   const run = useCallback(
@@ -53,12 +65,12 @@ export const useAsync = <D>(
         }
       });
       // 发送请求设置状态为loading
-      setState((prevState) => ({ ...prevState, stat: "loading" }));
+      safeDispatch({ stat: "loading" });
       return (
         promise
           .then((data) => {
             console.log(data);
-            if (mountRef.current) setData(data);
+            setData(data);
             return data;
           })
           //  catch 会消化错误，所以不会抛出错误，
@@ -69,7 +81,7 @@ export const useAsync = <D>(
           })
       );
     },
-    [config.throwOnError, mountRef, setData, setError]
+    [config.throwOnError, safeDispatch, setData, setError]
   );
 
   return {
