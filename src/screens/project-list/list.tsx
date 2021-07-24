@@ -4,6 +4,8 @@ import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import { Pin } from "../../components/pin";
 import { useEditProject } from "../../utils/useProject";
+import { useDispatch } from "react-redux";
+import { projectListAction } from "./project-list.slice";
 
 export interface Project {
   id: number;
@@ -17,10 +19,10 @@ export interface Project {
 interface ListProps extends TableProps<any> {
   users: User[];
   refresh?: () => void;
-  projectButton?: JSX.Element;
 }
 
 export const List = ({ users, ...props }: ListProps) => {
+  const dispatch = useDispatch();
   const { mutate } = useEditProject();
   // 函数柯里化
   const pinProject = (id: number) => (pin: boolean) =>
@@ -76,12 +78,21 @@ export const List = ({ users, ...props }: ListProps) => {
         },
         {
           title: "编辑",
-          render(value, project) {
+          render() {
             return (
               <Dropdown
                 overlay={
                   <Menu>
-                    <Menu.Item key={"edit"}>{props.projectButton}</Menu.Item>
+                    <Menu.Item key={"edit"}>
+                      <Button
+                        type={"link"}
+                        onClick={() =>
+                          dispatch(projectListAction.openProjectModal())
+                        }
+                      >
+                        编辑
+                      </Button>
+                    </Menu.Item>
                   </Menu>
                 }
               >

@@ -6,8 +6,11 @@ import { http } from "../utils/http";
 import { useMount } from "../utils";
 import { useAsync } from "../utils/use-async";
 import { FullPageError, FullPageLoading } from "../components/lib";
+import * as authStore from "stores/auth.slice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "stores/auth.slice";
 
-interface AuthForm {
+export interface AuthForm {
   username: string;
   password: string;
 }
@@ -35,18 +38,7 @@ const AuthContext = React.createContext<
 AuthContext.displayName = "AuthContext";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const {
-    isLoading,
-    isError,
-    isIdle,
-    error,
-    run,
-    data: user,
-    setData: setUser,
-  } = useAsync<User | null>();
-  const login = (form: AuthForm) => auth.login(form).then(setUser);
-  const register = (form: AuthForm) => auth.register(form).then(setUser);
-  const logout = () => auth.logout().then(() => setUser(null));
+  const { isLoading, isError, isIdle, error, run } = useAsync<User | null>();
 
   useMount(
     useCallback(async () => {
@@ -61,18 +53,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   if (isError) {
     return <FullPageError error={error} />;
   }
-  return (
-    <AuthContext.Provider
-      value={{ user, login, register, logout }}
-      children={children}
-    />
-  );
+  return <>{children}</>;
 };
 
 export const useAuth = () => {
-  const context = React.useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth必须在AuthProvider中使用");
-  }
-  return context;
+  const dispatch: (...args: unknown[]) => Promise<User> = useDispatch();
+  const user = useSelector(selectUser);
+  const login = useCallback(
+    (form: AuthForm) => dispatch(authStore.login(form)),
+    [dispatch]
+  );
+  const register = useCallback(
+    (form: AuthForm) => dispatch(authStore.register(form)),
+    [dispatch]
+  );
+  const logout = useCallback(() => dispatch(authStore.logout()), [dispatch]);
+  const bootStrap = useCallback(
+    () => dispatch(authStore.bootStrap()),
+    [dispatch]
+  );
+  return {
+    user,
+    login,
+    register,
+    logout,
+    bootStrap,
+  };
 };

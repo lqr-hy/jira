@@ -10,35 +10,16 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { ProjectScreen } from "./screens/project";
 import { resetRoute } from "./utils";
 import { ProjectModal } from "./screens/project-list/project-modal";
-import { useState } from "react";
 import { ProjectPopover } from "./components/project-popover";
 
 export const AuthenticatedApp = () => {
-  const [isOpenModal, setIsOpenModal] = useState(false);
   return (
     <Container>
-      <PageHeader
-        projectButton={
-          <Button type={"link"} onClick={() => setIsOpenModal(true)}>
-            创建项目
-          </Button>
-        }
-      />
+      <PageHeader />
       <Main>
         <Router>
           <Routes>
-            <Route
-              path={"/projects"}
-              element={
-                <ProjectListScreen
-                  projectButton={
-                    <Button type={"link"} onClick={() => setIsOpenModal(true)}>
-                      创建项目
-                    </Button>
-                  }
-                />
-              }
-            />
+            <Route path={"/projects"} element={<ProjectListScreen />} />
             <Route
               path={"/projects/:projectId/*"}
               element={<ProjectScreen />}
@@ -47,15 +28,12 @@ export const AuthenticatedApp = () => {
           </Routes>
         </Router>
       </Main>
-      <ProjectModal
-        openModal={isOpenModal}
-        onClose={() => setIsOpenModal(false)}
-      />
+      <ProjectModal />
     </Container>
   );
 };
 
-const PageHeader = (props: { projectButton: JSX.Element }) => {
+const PageHeader = () => {
   const { logout, user } = useAuth();
   return (
     <Header between={true}>
@@ -63,7 +41,7 @@ const PageHeader = (props: { projectButton: JSX.Element }) => {
         <Button type={"link"} onClick={resetRoute}>
           <SoftwareLogo width={"18rem"} color={"rgba(38,132,255)"} />
         </Button>
-        <ProjectPopover projectButton={props.projectButton} />
+        <ProjectPopover />
         <span>项目3</span>
       </HeaderLeft>
       <HeaderRight>
